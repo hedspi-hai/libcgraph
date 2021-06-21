@@ -801,30 +801,28 @@ void Coloring(Graph g)
     jrb_traverse(ptr, g.vertices)
         n++;
 
-    printf("%d\n", n);
-
     A = (int *)calloc(n, sizeof(int));
     B = (int *)malloc(n * sizeof(int));
     C = (int *)malloc(n * sizeof(int));
 
+    i = 0;
     jrb_traverse(ptr, g.vertices)
         C[i++] = jval_i(ptr->key);
 
     //Tìm số bậc của đỉnh, lưu vào A
     for (i = 0; i < n; ++i)
     {
-        nadj = outdegree(g, i, adj);
+        nadj = outdegree(g, C[i], adj);
         A[i] += nadj;
         for (j = 0; j < nadj; ++j)
-            if (hasEdge(g, adj[j], i) == 1)
+            if (hasEdge(g, adj[j], C[i]) == 1)
                 A[i]--;
-        A[i] += indegree(g, i, adj);
+        A[i] += indegree(g, C[i], adj);
     }
 
     //Copy mảng A sang mảng B
     for (i = 0; i < n; ++i)
         B[i] = A[i];
-
     //Tìm thứ tự đỉnh xếp theo bậc từ cao đến thấp, lưu vào A
     for (a = 0; a < n; ++a)
     {
@@ -848,7 +846,7 @@ void Coloring(Graph g)
         B[A[i]] = 0; //Màu mặc định = 0
 
         for (b = 0; b < i; ++b)
-            if ((hasEdge(g, A[i], A[b]) || hasEdge(g, A[b], A[i])) && B[A[i]] == B[A[b]])
+            if ((hasEdge(g, C[A[i]], C[A[b]]) || hasEdge(g, C[A[b]], C[A[i]])) && B[A[i]] == B[A[b]])
             {
                 //Nếu 2 đỉnh của 1 cạnh có cùng màu
                 B[A[i]]++;
@@ -904,6 +902,7 @@ void Coloring(Graph g)
 
     free(A);
     free(B);
+    free(C);
     fclose(fp);
     return;
 }
